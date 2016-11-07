@@ -1,0 +1,80 @@
+---
+title: 'How does transmission affect MPG: a data exploration on mtcars in R'
+author: "Chun Fang"
+date: "11/7/2016"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## The data analytic question
+
+Given \textcolor{red}{mtcars} data, we are interested in exploring the relationship between a set of variables and miles per gallon (MPG) (outcome). In particular, we answer the following two questions.
+
+- Is an automatic or manual transimission better for MPG?
+- Quantify the MPG difference between automatic and manual transimssions.
+
+## Checking the data
+The \textcolor{red}{mtcars} data is collected in R datasets and one can obtain its basic information by running \emph{?mtcars} in the R console or going to the following link:
+
+https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/mtcars.html
+
+In short, the data \textcolor{red}{mtcars} was extracted from the 1974 Motor Trend US magazine, and comprises fuel consumption and 10 aspects of automobile design and performance for 32 automobiles (1973–74 models). To fit our questions, note that for transmission (coded as am) variable,  0 means automatic and 1 means manual.
+
+## Exploratory analysis
+
+Recall that our purpose is to investigate the relationship between transimission and MPG. Note that each observation of the data records a value of mpg with respect to a SINGLE value of transimission for a car. However, we are not clear the comparision of mpg values under different transimissions of the same car. So it might be missleading if we only fit a linear model mpg ~ am to answer even the first question, because a third regressor can distort the analysis.  As a result, we decide to choose a better model among relations mpg ~ me + others beased on Akaike Information Criterion (AIC). In R, we realize it by using function \emph{step()}.
+
+First, let have a look at the structure of the data.
+
+```{r exploratory_analysis1, echo = TRUE}
+data(mtcars)
+str(mtcars)
+unique(mtcars$carb)
+```
+
+Having aims in the mind, we tidy the mtcars data so that its variables am, cyl, vs, gear are factors. Here, we didn't convert the variable carb to factor, because it has 6 values while we have only 32 obs..
+
+
+```{r exploratory_analysis2, echo = TRUE, results = "hide"}
+library(dplyr)
+mtcars <- mutate(mtcars, am = as.factor(am), cyl = as.factor(cyl), 
+                         vs = as.factor(vs), gear = as.factor(gear))
+```
+
+
+## Statistical modeling and inference
+
+```{r modeling}
+fit <- lm(mpg ~ ., data = mtcars)
+stepModel <- step(fit, trace = 0)
+summary(stepModel)
+```
+
+Now, let us have a look at the residual plot.
+
+```{r residual_plot}
+par(mfrow = c(2,2))
+plot(stepModel)
+```
+
+From residual plot, we don't find a special pattern, which is good.
+
+## Summary
+
+From above analysis, we conclude that the model mpg ~ am + wt + qsec explaned 84.97% variation of the data. The p-value is 1.21e-11. While we are not satisfy the Pr(>|t|) value of Intercept. 
+
+Based on obtained result on mtcars, we conclude that automatic transimission is better for MPG, since under the same conditions, automatic transimission can save 2.9358 (US) gallon per mile than manual transimission.
+
+
+
+## Appendix
+
+### Pairwise plot matrix for revised data mtcars
+```{r}
+library(GGally)
+ggpairs(mtcars)
+```
+
