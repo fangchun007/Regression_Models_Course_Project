@@ -1,0 +1,16 @@
+The following works are good for references.
+
+1. I tried the model, which looks good.
+
+fit <- lm(mpg ~ am + carb + disp, data = mtcars)
+summary(fit)
+
+2. step function:
+fit1 <- lm(mpg ~ I(factor(am)), data = mtcars)
+fit2 <- lm(mpg ~ ., data = mtcars)
+step(fit2, scope = list(lower = fit1, upper = fit2))
+
+
+3. https://s3.amazonaws.com/coursera-uploads/peer-review/a_xPWXNVEeWxvQr3acyajw/dd1554ca0d569e4497901d409686a7a9/transmissionTypeAndMPG.pdf
+
+4. https://s3.amazonaws.com/coursera-uploads/peer-review/a_xPWXNVEeWxvQr3acyajw/3e87c66c1b01b2ea04dc5c8231196922/project.pdf
